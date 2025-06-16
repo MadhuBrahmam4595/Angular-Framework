@@ -1,0 +1,350 @@
+1. creating component  
+======================
+	# ng generate component home | # ng g c home (Syntax: ng generate component <component-name>
+
+2️. Setup Routes
+================
+	Open src/app/app-routing.module.ts — if not exists, create it using: # ng generate module app-routing --flat --module=app
+	Now configure routes:
+	import { NgModule } from '@angular/core';
+	import { RouterModule, Routes } from '@angular/router';
+	import { HomeComponent } from './home/home.component';
+	import { AboutComponent } from './about/about.component'; 
+
+	const routes: Routes = [
+	  { path: '', component: HomeComponent },
+	  { path: 'about', component: AboutComponent } 
+	];
+
+	@NgModule({
+	  imports: [RouterModule.forRoot(routes)],
+	  exports: [RouterModule]
+	})
+	export class AppRoutingModule { }
+
+
+3. Add Router Outlet : In app.component.html replace everything with:
+=====================================================================
+	<h1>Angular Routing Demo</h1>
+	<nav>
+	  <a routerLink="/">Home</a> |
+	  <a routerLink="/about">About</a> |
+	  <a routerLink="/contact">Contact</a> |
+	  <a routerLink="/employees">Employees</a>
+	</nav>
+	<hr>
+	<router-outlet></router-outlet>
+
+	
+4. Angular Forms (Template-Driven Forms)
+========================================
+i. Import FormsModule : Open app.module.ts:
+-------------------------------------------
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { EmployeeComponent } from './employee/employee.component';
+import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+import { ContactComponent } from './contact/contact.component';
+import { FormsModule } from '@angular/forms';   // <-- Add this
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    EmployeeComponent,
+    HomeComponent,
+    AboutComponent,
+    ContactComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule  // <-- Add this
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+ii. Add Form to employee.component.html
+---------------------------------------
+	<h2>Add Employee</h2>
+
+	<form #employeeForm="ngForm" (ngSubmit)="onSubmit(employeeForm)">
+  	<div>
+    		<label>Name:</label>
+    		<input type="text" name="name" [(ngModel)]="employee.name" required>
+    		<div *ngIf="employeeForm.submitted && !employee.name"> Name is required </div>
+  	</div>
+
+  	<div>
+    		<label>Position:</label>
+    		<input type="text" name="position" [(ngModel)]="employee.position" required>
+    		<div *ngIf="employeeForm.submitted && !employee.position"> Position is required
+    		</div>
+  	</div>
+
+  	<div>
+    		<label>Salary:</label>
+    		<input type="number" name="salary" [(ngModel)]="employee.salary" required>
+    		<div *ngIf="employeeForm.submitted && !employee.salary"> Salary is required </div>
+  	</div>
+
+  	<button type="submit">Submit</button>
+	</form>
+
+<hr>
+
+<h3>Submitted Employee:</h3>
+<pre>{{ employee | json }}</pre>
+
+3. Handle form submission in employee.component.ts
+--------------------------------------------------
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+
+@Component({
+  selector: 'app-employee',
+  templateUrl: './employee.component.html',
+  styleUrls: ['./employee.component.css']
+})
+export class EmployeeComponent {
+  
+  employee = {
+    name: '',
+    position: '',
+    salary: null
+  };
+
+  onSubmit(form: NgForm) {
+    if (form.valid) {
+      console.log('Submitted Employee:', this.employee);
+      alert('Employee Added Successfully!');
+      form.resetForm();
+    }
+  }
+}
+
+
+5. STEP 11: Reactive Forms
+==========================
+✅ Reactive Forms are more powerful, scalable and better for big projects.
+
+✅ What are Reactive Forms?
+Reactive Forms in Angular are:
+| Feature                          | Description                                                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Model-driven**                 | The form structure and validation logic are defined in the component class using FormGroup and FormControl objects. |
+| **Synchronous & Predictable**    | Every input is bound to a form control — easy to track, test, and debug.                                            |
+| **Best for large/complex forms** | Especially when forms have conditional logic, custom validations, dynamic fields, etc.                              |
+
+
+🧠 Key Concepts
+1️. FormGroup
+=> Represents the entire form.
+=> It’s a collection of FormControls.
+=> You use it to manage the form's value and validation state.
+
+this.employeeForm = this.fb.group({
+  name: ['', Validators.required],
+  position: ['', Validators.required],
+  salary: [null, [Validators.required, Validators.min(10000)]]
+});
+
+Here:
+=> name, position, and salary are FormControls
+=> this.fb.group({...}) is a shortcut using FormBuilder to build a FormGroup
+
+2️. FormControl
+=> Represents an individual field in the form.
+=> Tracks the value, touched/untouched, dirty/pristine, and validation status.
+=> name: ['', Validators.required]
+This line means:
+=> The name field has an initial value of ''
+=> It is required (Validators.required)
+
+3. FormBuilder
+=> A service provided by Angular to simplify form creation.
+Avoids writing:
+=> new FormControl('', Validators.required)
+
+✅ So instead of:
+this.employeeForm = new FormGroup({
+  name: new FormControl('', Validators.required)
+});
+
+We write:
+this.employeeForm = this.fb.group({
+  name: ['', Validators.required]
+});
+
+Much cleaner!
+
+4. formGroup and formControlName (in HTML)
+In HTML:
+<form [formGroup]="employeeForm">
+  <input formControlName="name">
+</form>
+
+=> [formGroup] binds the HTML form to the form model in TypeScript.
+=> formControlName binds individual input fields to FormControls inside the FormGroup.
+
+5. Validation in Reactive Forms
+In the component:
+Validators.required,
+Validators.min(10000)
+
+In the template:
+<div *ngIf="employeeForm.get('salary').invalid && employeeForm.get('salary').touched">
+  Salary must be at least ₹10000
+</div>
+
+Angular provides built-in validators and you can even write your own custom validators.
+
+6. Form Submission
+onSubmit(): void {
+  if (this.employeeForm.valid) {
+    console.log(this.employeeForm.value);
+    alert('Employee Added Successfully!');
+    this.employeeForm.reset();
+  }
+}
+=> this.employeeForm.valid checks if all fields pass validation
+=> this.employeeForm.value gives current form values
+=> reset() clears the form after successful submit
+
+🧠 Summary Table:
+| Concept           | Description                               |
+| ----------------- | ----------------------------------------- |
+| `FormGroup`       | Container for form controls               |
+| `FormControl`     | Represents a single input field           |
+| `FormBuilder`     | Helps build forms more easily             |
+| `Validators`      | Built-in (or custom) rules for validation |
+| `formGroup`       | Directive to bind form model to DOM       |
+| `formControlName` | Connects input field to model             |
+| `form.value`      | Object with current values                |
+| `form.valid`      | Boolean to check if form is valid         |
+
+====================== coding files ===>
+
+i. Import ReactiveFormsModule : Open app.module.ts and import:
+--------------------------------------------------------------
+import { ReactiveFormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    EmployeeComponent,
+    HomeComponent,
+    AboutComponent,
+    ContactComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule   // <-- Add this
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+ii. Update employee.component.ts for Reactive Form
+-------------------------------------------------
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-employee',
+  templateUrl: './employee.component.html',
+  styleUrls: ['./employee.component.css']
+})
+export class EmployeeComponent implements OnInit {
+
+  employeeForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    this.employeeForm = this.fb.group({
+      name: ['', Validators.required],
+      position: ['', Validators.required],
+      salary: [null, [Validators.required, Validators.min(10000)]]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.employeeForm.valid) {
+      console.log('Submitted Employee:', this.employeeForm.value);
+      alert('Employee Added Successfully!');
+      this.employeeForm.reset();
+    } else {
+      console.log('Form Invalid');
+    }
+  }
+}
+
+iii. Update employee.component.html
+-----------------------------------
+<h2>Reactive Form - Add Employee</h2>
+
+<form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+
+  <div>
+    <label>Name:</label>
+    <input type="text" formControlName="name">
+    <div *ngIf="employeeForm.get('name').invalid && employeeForm.get('name').touched">
+      Name is required
+    </div>
+  </div>
+
+  <div>
+    <label>Position:</label>
+    <input type="text" formControlName="position">
+    <div *ngIf="employeeForm.get('position').invalid && employeeForm.get('position').touched">
+      Position is required
+    </div>
+  </div>
+
+  <div>
+    <label>Salary:</label>
+    <input type="number" formControlName="salary">
+    <div *ngIf="employeeForm.get('salary').invalid && employeeForm.get('salary').touched">
+      Salary must be at least ₹10000
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="employeeForm.invalid">Submit</button>
+</form>
+
+<hr>
+
+<h3>Current Form Value:</h3>
+<pre>{{ employeeForm.value | json }}</pre>
+
+
+
+Angular Lazy Loading (Enterprise Level Routing)
+***********************************************
+🧠 What is Lazy Loading?
+=> Load Angular modules only when required.
+=> Faster initial load time.
+=> Great for large apps.
+=> Perfect for micro-frontends / enterprise.
+
+🏗 How to implement Lazy Loading
+
+1️. Create Feature Modules
+-------------------------
+👉 Generate feature modules:
+
+ng generate module employees --route employees --module app
+ng generate module about --route about --module app
+ng generate module contact --route contact --module app
+
+(Angular CLI will automatically create lazy-loaded routes!)
+

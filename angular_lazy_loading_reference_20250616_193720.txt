@@ -1,0 +1,271 @@
+
+Angular Lazy Loading (Enterprise Level Routing) - Full Reference
+
+=======================================================================
+Theory: What is Lazy Loading?
+-----------------------------------------------------------------------
+- Lazy loading means: load feature modules only when needed.
+- Improves initial app load time.
+- Each module loads dynamically on demand.
+- Great for large enterprise apps with multiple modules.
+
+Why Lazy Loading?
+-----------------------------------------------------------------------
+Without Lazy Loading      | With Lazy Loading
+--------------------------|--------------------------
+All modules load at start | Modules load when needed
+Slow first load           | Fast first load
+High memory usage upfront | Optimized memory usage
+Not scalable for large apps | Highly scalable
+
+How Angular Lazy Loading Works
+-----------------------------------------------------------------------
+- Uses Angular Router with dynamic imports
+- Modules have their own routing configs
+- Angular loads modules dynamically on navigation
+
+=======================================================================
+Implementation Steps
+-----------------------------------------------------------------------
+
+1️⃣ Generate Module:
+
+ng generate module emps
+
+2️⃣ Generate Components inside Module:
+
+ng generate component emps/employee-list
+ng generate component emps/employee-form
+
+3️⃣ Setup Routes inside emps.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { EmployeeFormComponent } from './employee-form/employee-form.component';
+import { RouterModule, Routes } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+const routes: Routes = [
+  { path: '', component: EmployeeListComponent },
+  { path: 'form', component: EmployeeFormComponent }
+];
+
+@NgModule({
+  declarations: [
+    EmployeeListComponent,
+    EmployeeFormComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule.forChild(routes)
+  ]
+})
+export class EmpsModule { }
+
+4️⃣ Configure Main App Routes:
+
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: 'emps',
+    loadChildren: () => import('./emps/emps.module').then(m => m.EmpsModule)
+  },
+  { path: '', redirectTo: 'emps', pathMatch: 'full' }
+];
+
+=======================================================================
+Full Reference Code Snippets
+=======================================================================
+
+Employee Model (employee.model.ts)
+-----------------------------------------------------------------------
+export interface Employee {
+  id?: number;
+  name: string;
+  position: string;
+  salary: number;
+}
+
+Employee Service (employee.service.ts)
+-----------------------------------------------------------------------
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Employee } from './employee.model';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+  private apiUrl = 'http://localhost:8080/api/employees';
+
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(this.apiUrl);
+  }
+
+  getById(id: number): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/${id}`);
+  }
+
+  create(employee: Employee): Observable<Employee> {
+    return this.http.post<Employee>(this.apiUrl, employee);
+  }
+
+  update(id: number, employee: Employee): Observable<Employee> {
+    return this.http.put<Employee>(`${this.apiUrl}/${id}`, employee);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+}
+
+Employee List Component (employee-list.component.ts)
+-----------------------------------------------------------------------
+import { Component, OnInit } from '@angular/core';
+import { EmployeeService } from '../employee.service';
+import { Employee } from '../employee.model';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html'
+})
+export class EmployeeListComponent implements OnInit {
+  employees: Employee[] = [];
+
+  constructor(private service: EmployeeService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.loadEmployees();
+  }
+
+  loadEmployees(): void {
+    this.service.getAll().subscribe(data => {
+      this.employees = data;
+    });
+  }
+
+  deleteEmployee(id: number): void {
+    if (confirm('Are you sure to delete?')) {
+      this.service.delete(id).subscribe(() => {
+        this.loadEmployees();
+      });
+    }
+  }
+
+  addEmployee(): void {
+    this.router.navigate(['emps/form']);
+  }
+
+  editEmployee(emp: Employee): void {
+    this.router.navigate(['emps/form'], { state: { data: emp } });
+  }
+}
+
+Employee List Template (employee-list.component.html)
+-----------------------------------------------------------------------
+<div class="container mt-4">
+  <h3>Employee List</h3>
+  <button class="btn btn-primary mb-3" (click)="addEmployee()">Add Employee</button>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th><th>Position</th><th>Salary</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let emp of employees">
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.position }}</td>
+        <td>{{ emp.salary }}</td>
+        <td>
+          <button class="btn btn-sm btn-info" (click)="editEmployee(emp)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteEmployee(emp.id!)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+Employee Form Component (employee-form.component.ts)
+-----------------------------------------------------------------------
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EmployeeService } from '../employee.service';
+import { Employee } from '../employee.model';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-employee-form',
+  templateUrl: './employee-form.component.html'
+})
+export class EmployeeFormComponent implements OnInit {
+  form: FormGroup;
+  empId: number | null = null;
+
+  constructor(private fb: FormBuilder, private service: EmployeeService, private router: Router) {
+    const nav = this.router.getCurrentNavigation();
+    const state = nav?.extras?.state as { data?: Employee };
+    if (state?.data) {
+      this.empId = state.data.id ?? null;
+      this.form = this.fb.group({
+        name: [state.data.name, Validators.required],
+        position: [state.data.position, Validators.required],
+        salary: [state.data.salary, Validators.required]
+      });
+    } else {
+      this.form = this.fb.group({
+        name: ['', Validators.required],
+        position: ['', Validators.required],
+        salary: ['', Validators.required]
+      });
+    }
+  }
+
+  ngOnInit(): void {}
+
+  submit(): void {
+    const emp: Employee = this.form.value;
+    if (this.empId) {
+      this.service.update(this.empId, emp).subscribe(() => this.router.navigate(['emps']));
+    } else {
+      this.service.create(emp).subscribe(() => this.router.navigate(['emps']));
+    }
+  }
+}
+
+Employee Form Template (employee-form.component.html)
+-----------------------------------------------------------------------
+<div class="container mt-4">
+  <h3>{{ empId ? 'Edit' : 'Add' }} Employee</h3>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label>Name</label>
+      <input class="form-control" formControlName="name">
+    </div>
+
+    <div class="mb-3">
+      <label>Position</label>
+      <input class="form-control" formControlName="position">
+    </div>
+
+    <div class="mb-3">
+      <label>Salary</label>
+      <input class="form-control" type="number" formControlName="salary">
+    </div>
+
+    <button class="btn btn-success" type="submit" [disabled]="form.invalid">Submit</button>
+  </form>
+</div>
+
+=======================================================================
+END OF REFERENCE FILE
+=======================================================================

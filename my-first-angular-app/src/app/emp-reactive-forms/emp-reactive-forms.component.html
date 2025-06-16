@@ -1,0 +1,23 @@
+<p>emp-reactive-forms works!</p>
+ 
+<form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+
+    <label>Name:</label>
+    <input type="text" formControlName="name"/>
+    <div *ngIf="employeeForm.get('name')?.invalid && employeeForm.get('name')?.touched">Name is required</div>
+
+    <label>Position:</label>
+    <input type="text" formControlName="position" />
+    <div *ngIf="employeeForm.get('position')?.invalid && employeeForm.get('position')?.touched">Position is required</div>
+
+    <label>Salary:</label>
+    <input type="text" formControlName="salary" />
+    <div *ngIf="employeeForm.get('salary')?.invalid && employeeForm.get('salary')?.touched">Salary must be at least ₹10000</div>
+
+    <button type="submit" [disabled]="employeeForm.invalid">Submit</button>
+
+</form>
+<hr>
+
+<h3>Current Form Value:</h3>
+<pre>{{ employeeForm.value | json }}</pre>

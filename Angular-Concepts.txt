@@ -1,0 +1,121 @@
+Core Angular Concepts
+=====================
+Modules
+  => NgModule and its role in structuring an Angular app.
+  => Feature modules and lazy loading.
+
+Components
+  => Component lifecycle hooks (e.g., ngOnInit, ngOnDestroy).
+  => Component communication (Input, Output, EventEmitter).
+  => Change detection.
+
+Templates and Directives
+  => Structural directives (*ngIf, *ngFor).
+  => Attribute directives ([ngStyle], [ngClass], custom directives).
+  => Template reference variables and interpolation.
+
+Dependency Injection (DI)
+  => Services and providers.
+  => Hierarchical injector.
+  => Using @Injectable and understanding scopes.
+
+Data Binding
+  => One-way binding (interpolation and property binding).
+  => Two-way binding ([(ngModel)]).
+  => Event binding.
+
+Routing
+  => RouterModule and defining routes.
+  => Route guards (canActivate, canDeactivate, etc.).
+  => Lazy loading and preload strategies.
+  => Query parameters and route parameters.
+
+Forms
+  => Template-driven forms.
+  => Reactive forms.
+  => Form validation (built-in and custom validators).
+
+Advanced Angular Concepts
+=========================
+RxJS and Observables
+  => Working with observables and operators (map, filter, switchMap, etc.).
+  => Subjects and BehaviorSubjects.
+  => Async pipe.
+
+State Management
+  => Component state vs application state.
+  => Managing state with services.
+  => Libraries like NgRx or Akita.
+
+Change Detection
+  => Zones and Angular’s default change detection mechanism.
+  => OnPush change detection strategy.
+
+Pipes
+  => Built-in pipes (e.g., date, async, currency).
+  => Creating custom pipes.
+
+Testing
+  => Unit testing with Jasmine and Karma.
+  => End-to-end testing with Protractor or Cypress.
+  => Mocking dependencies in tests.
+
+Performance Optimization
+========================
+1. Lazy Loading Modules
+    => Breaking large apps into smaller, lazy-loaded modules.
+
+2. Ahead-of-Time (AOT) Compilation
+    => Difference between AOT and Just-in-Time (JIT) compilation.
+
+3. TrackBy with *ngFor
+    => Improving performance in large lists.
+
+4. Optimizing Change Detection
+    => Using OnPush strategy when possible.
+
+5. Tree Shaking and Bundle Optimization
+    => Reducing the final bundle size with Angular CLI.
+
+Ecosystem and Tools
+==================
+1. Angular CLI
+    => Scaffolding, serving, and generating code.
+    => Configuration and custom builders.
+
+2. TypeScript
+    => Decorators, interfaces, generics, and modules.
+    => Strict typing for better code quality.
+
+3. SCSS and CSS Styling
+    => Component-specific styles.
+    => Shadow DOM and view encapsulation.
+
+4. Angular Material
+    => Using prebuilt UI components.
+    => Customizing themes and responsive design.
+
+5. Third-party Libraries
+    => Integration with libraries like PrimeNG, ngx-bootstrap, etc.
+
+Other Important Concepts
+========================
+1. Authentication and Authorization
+    => JWT, OAuth2.
+    => Using HttpClient for API calls.
+
+2. Internationalization (i18n)
+    => Localization using Angular’s i18n tools.
+
+3. Server-side Rendering (SSR)
+    => Angular Universal for SEO and performance improvements.
+
+4. Progressive Web Apps (PWAs)
+    => Creating offline-first Angular apps.
+
+5. Real-time Communication
+    => WebSockets or SignalR with Angular.
+
+Version-specific Features
+=========================
+Stay updated on the latest Angular features. For Angular 18, know the improvements or breaking changes introduced since previous versions.

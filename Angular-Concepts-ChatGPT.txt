@@ -1,0 +1,241 @@
+🟢 Core Angular Fundamentals
+1. Angular CLI (Command Line Interface)
+2. Modules (@NgModule)
+3. Components (@Component)
+4. Templates and View
+5. Data Binding
+   i.   Interpolation {{ }}
+   ii.  Property binding [property]
+   iii. Event binding (event)
+   iv.  Two-way binding [(ngModel)]
+6. Directives
+   i.  Structural (*ngIf, *ngFor, *ngSwitch)
+   ii. Attribute ([ngClass], [ngStyle], custom directives)
+
+🔁 Component Communication
+1. @Input() and @Output()
+2. EventEmitter
+3. ViewChild and ContentChild
+4. Services and Dependency Injection (DI)
+5. Shared Modules & Components
+
+🔄 Lifecycle Hooks
+1. ngOnInit()
+2. ngOnChanges()
+3. ngDoCheck()
+4. ngAfterViewInit(), ngAfterContentInit(), etc.
+5. ngOnDestroy()
+
+📦 Routing and Navigation
+1. RouterModule & Routes
+2. Route Parameters (ActivatedRoute)
+3. Route Guards (CanActivate, CanDeactivate)
+4. Lazy Loading Modules
+5. RouterLink and RouterOutlet
+
+📬 Forms in Angular
+1. Template-driven Forms
+2. Reactive Forms
+3. FormControl, FormGroup, FormArray
+4. Validation (built-in and custom)
+5. Async Validators
+
+🌐 HTTP Client
+1. HttpClientModule
+2. GET, POST, PUT, DELETE
+3. Observables and RxJS
+4. Interceptors
+5. Error Handling
+
+📦 RxJS Concepts
+1. Observable, Subject, BehaviorSubject
+2. Operators (map, switchMap, mergeMap, debounceTime, etc.)
+3. Subscription and Unsubscription
+4. AsyncPipe
+
+🔐 Authentication & Authorization
+1. JWT Token Handling
+2. Route Guards for protected routes
+3. Interceptor for attaching tokens
+4. Login/Logout mechanisms
+
+📁 Project Structure & Best Practices
+1. Feature Modules
+2. Core & Shared Modules
+3. Environment Files
+4. Folder Structuring
+5. State Management Basics
+
+⚙️ Advanced Angular Concepts
+1. Standalone Components (Angular 14+)
+2. Signals and Fine-grained Reactivity (Angular 16+)
+3. Change Detection Strategy
+4. Custom Pipes and Directives
+5. NgZone
+6. Renderer2
+7. Dynamic Component Loading
+
+🧪 Testing
+1. Unit Testing with Jasmine and Karma
+2. TestBed
+3. Component, Service, and Pipe testing
+4. Mocking and Spying
+5. End-to-End (E2E) Testing with Protractor or Cypress
+
+🐳 Build and Deployment
+1. Angular Universal (SSR)
+2. Service Workers (PWA)
+3. Production Build (ng build --prod)
+4. Environment Configurations
+5. Dockerizing Angular App
+
+
+
+=================================== 🟢 Core Angular Fundamentals =====================
+1. Angular CLI (Command Line Interface)
+
+   🔷 What is Angular CLI?
+   Angular CLI is a powerful command-line tool to create, develop, scaffold, test, and build Angular applications efficiently.
+   ✅ Installed globally, it helps automate repetitive tasks and enforces best practices.
+   
+   🔧 How to Install Angular CLI : # npm install -g @angular/cli
+   ✅ To verify installation: # ng version
+   
+   📦 Creating a New Angular Application :# ng new my-app
+   It will prompt: * Whether to add routing   * Which stylesheet format (CSS, SCSS, etc.)
+   Then: # cd my-app
+   Then # ng serve
+   Opens app at: http://localhost:4200
+
+   🔥 Commonly Used Angular CLI Commands
+   1. Create/Generate Commands
+   | Command                     | Purpose                          |
+   | --------------------------- | -------------------------------- |
+   | `ng generate component xyz` | Creates a new component          |
+   | `ng generate service xyz`   | Creates a new service            |
+   | `ng generate module xyz`    | Creates a new module             |
+   | `ng generate directive xyz` | Creates a new directive          |
+   | `ng generate pipe xyz`      | Creates a new pipe               |
+   | `ng generate class xyz`     | Creates a plain TypeScript class |
+   | `ng generate guard xyz`     | Creates an Angular route guard   |
+   ✅ Short form: ng g c xyz, ng g s xyz, etc.
+
+   2. Serve & Build Commands
+   | Command           | Description                                     |
+   | ----------------- | ----------------------------------------------- |
+   | `ng serve`        | Compiles and runs your app in dev mode          |
+   | `ng build`        | Compiles app into output directory (`dist/`)    |
+   | `ng build --prod` | Builds app for production (minified, optimized) |
+   | `ng test`         | Runs unit tests via Karma                       |
+   | `ng lint`         | Runs static code analysis                       |
+   | `ng e2e`          | Runs end-to-end tests                           |
+
+   3. Run Commands
+   | Command                | Description                              |
+   | ---------------------- | ---------------------------------------- |
+   | `ng run`               | Runs a custom architect target           |
+   | `ng deploy`            | Deploys the app using configured builder |
+   | `ng serve --port 4300` | Serve app on custom port                 |
+
+   ⚙️ Angular CLI Configuration
+   angular.json (project config)
+      Controls app structure, build options, styles/scripts to include.
+      Example snippet:
+         "styles": [
+            "src/styles.css"
+         ],
+         "scripts": []
+
+   package.json
+      Manages CLI version and app dependencies.
+
+   🌐 Serving App with Custom Settings
+   # ng serve --open --port=4500 --host=0.0.0.0
+   Options: --open: opens browser --port: custom port --host: expose to LAN
+
+   🧪 Testing with CLI
+   # ng test
+   Runs unit tests in Karma.
+   # ng e2e
+   Runs end-to-end tests (Protractor or Cypress if configured).
+
+   📁 Folder Structure (auto-generated by CLI)
+   my-app/
+   ├── src/
+   │   ├── app/              # Components, Modules, Services
+   │   ├── assets/           # Static assets
+   │   ├── environments/     # Env config (dev, prod)
+   │   └── index.html        # Main HTML
+   ├── angular.json          # Angular config
+   ├── package.json          # NPM dependencies
+   ├── tsconfig.json         # TypeScript config
+   └── README.md
+
+   💡 Helpful Tips
+   Use --dry-run to preview changes: # ng generate component test --dry-run
+   Generate a component in a folder: # ng g c features /home
+   Use --skip-tests if you don’t want test files: # ng g c hello --skip-tests
+
+
+2. Modules (@NgModule)
+   🔷 What is an Angular Module?
+   ✅ Theory:
+   An Angular Module is a container for a cohesive block of functionality in your app.
+   It helps in organizing code and enabling lazy loading, code splitting, and feature encapsulation.
+
+   ✅ Types:
+   Root Module: AppModule (main entry point)
+   Feature Modules: encapsulate specific functionality (e.g. UserModule, AdminModule)
+   Shared Module: reusable directives, pipes, and components
+   Core Module: singleton services, app-wide providers
+
+   🔷 @NgModule Decorator
+   Used to define metadata about the module.
+
+   ✅ Structure:
+   @NgModule({
+     declarations: [...],   // Components, Directives, Pipes
+     imports: [...],        // Other modules imported
+     exports: [...],        // Components, Directives, Pipes to be used in other modules
+     providers: [...],      // Services (scoped to this module)
+     bootstrap: [...]       // Main component to bootstrap (only in AppModule)
+   })
+   export class AppModule { }
+
+   🔷 Root Module Example (AppModule)
+   // app.module.ts
+   import { NgModule } from '@angular/core';
+   import { BrowserModule } from '@angular/platform-browser';
+
+   import { AppComponent } from './app.component';
+   import { HelloComponent } from './hello/hello.component';
+
+   @NgModule({
+     declarations: [
+       AppComponent,
+       HelloComponent
+     ],
+     imports: [
+       BrowserModule
+     ],
+     providers: [],
+     bootstrap: [AppComponent]
+   })
+   export class AppModule { }
+
+   🔷 Feature Module Example
+   1. Create a module: # 
+   
+
+
+
+3. Components (@Component)
+4. Templates and View
+5. Data Binding
+   i.   Interpolation {{ }}
+   ii.  Property binding [property]
+   iii. Event binding (event)
+   iv.  Two-way binding [(ngModel)]
+6. Directives
+   i.  Structural (*ngIf, *ngFor, *ngSwitch)
+   ii. Attribute ([ngClass], [ngStyle], custom directives)
